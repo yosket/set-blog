@@ -1,4 +1,13 @@
 ---
+declare global {
+  interface Document {
+    createDocumentTransition: any
+  }
+  interface CSSStyleDeclaration {
+    pageTransitionTag: any
+  }
+}
+
 export interface Props {
   title: string
 }
@@ -12,11 +21,65 @@ const { title } = Astro.props
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
   <body>
-    <slot />
+    <div>
+      <header class="p-4">
+        <h1 class="text-4xl font-bold">Shared Element Transition</h1>
+      </header>
+      <main id="content">
+        <slot />
+      </main>
+      <footer class="p-4">footer</footer>
+    </div>
+
+    <script>
+      async function getHTMLFragment(pathname: string) {
+        const response = await fetch(`/fragments/posts${pathname}`)
+        return await response.text()
+      }
+
+      function updateTheDOMSomehow(html: string) {
+        document.getElementById('content')!.innerHTML = html
+      }
+
+      window.navigation.addEventListener('navigate', (navigateEvent) => {
+        const url = new URL(navigateEvent.destination.url)
+
+        navigateEvent.intercept({
+          async handler() {
+            const html = await getHTMLFragment(url.pathname)
+
+            // If the browser doesn't support this API, update the DOM as usual
+            if (!document.createDocumentTransition) {
+              updateTheDOMSomehow(html)
+              return
+            }
+
+            const thumbnail = document.getElementById(
+              `thumbnail-${url.pathname.replace('/', '')}`
+            )
+            if (thumbnail) {
+              thumbnail.style.pageTransitionTag = 'full-img'
+            }
+
+            // Otherwise, update the DOM within a transition
+            const transition = document.createDocumentTransition()
+            transition.start(() => {
+              if (thumbnail) {
+                thumbnail.style.pageTransitionTag = ''
+              }
+
+              updateTheDOMSomehow(html)
+            })
+
+            return undefined
+          },
+        })
+      })
+    </script>
+
     <style is:global>
       :root {
         --accent: 124, 58, 237;
@@ -27,13 +90,68 @@ const { title } = Astro.props
           white 60%
         );
       }
-      html {
-        font-family: system-ui, sans-serif;
-        background-color: #f6f6f6;
+
+      h1 {
+        color: transparent;
+        background-image: var(--accent-gradient);
+        background-clip: text;
+        -webkit-background-clip: text;
       }
-      code {
-        font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-          DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+      }
+
+      @keyframes fade-out {
+        to {
+          opacity: 0;
+        }
+      }
+
+      @keyframes slide-from-right {
+        from {
+          transform: translateX(30px);
+        }
+      }
+
+      @keyframes slide-to-left {
+        to {
+          transform: translateX(-30px);
+        }
+      }
+
+      ::page-transition-outgoing-image(root) {
+        animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
+      }
+
+      ::page-transition-incoming-image(root) {
+        animation: 210ms cubic-bezier(0, 0, 0.2, 1) 300ms both fade-in;
+      }
+
+      header {
+        page-transition-tag: header;
+        contain: paint;
+      }
+
+      .thumbnail {
+        contain: paint;
+      }
+
+      .full-img {
+        page-transition-tag: full-img;
+        contain: paint;
+      }
+
+      ::page-transition-outgoing-image(full-img),
+      ::page-transition-incoming-image(full-img) {
+        animation: none;
+        mix-blend-mode: normal;
+      }
+
+      ::page-transition-image-wrapper(full-img) {
+        isolation: none;
       }
     </style>
   </body>

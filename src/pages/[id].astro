@@ -1,0 +1,15 @@
+---
+import contents from '../assets/content.json'
+import Layout from '../layouts/Layout.astro'
+import Post from './fragments/posts/[id].astro'
+
+export const getStaticPaths = () =>
+  contents.map((content) => ({ params: { id: content.id } }))
+
+const { id } = Astro.params
+const entry = contents.find((entry) => entry.id === id)
+---
+
+<Layout title={entry?.title ?? ''}>
+  <Post />
+</Layout>
