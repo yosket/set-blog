@@ -1,6 +1,5 @@
 ---
 import contents from '../../../assets/content.json'
-import constitution_of_japan from '../../../assets/images/constitution_of_japan.jpg'
 
 export const getStaticPaths = () =>
   contents.map((content) => ({ params: { id: content.id } }))
@@ -9,16 +8,18 @@ const { id } = Astro.params
 const entry = contents.find((entry) => entry.id === id)
 ---
 
-<div class="container mx-auto space-y-8">
-  <div class="flex justify-center">
-    <img
-      class="full-img max-w-screen-lg object-cover aspect-video"
-      src={constitution_of_japan}
-      alt=""
-    />
+<div class="container mx-auto space-y-8 px-4">
+  <div class="-mx-4">
+    <div
+      class="full-img max-w-screen-lg mx-auto aspect-video bg-center bg-cover flex items-end justify-start p-16"
+      style={`background-image: url(/images/${entry?.image});`}
+    >
+      <h1 class="text-6xl font-bold drop-shadow-lg text-white opacity-90">
+        {entry?.title}
+      </h1>
+    </div>
   </div>
-  <div class="max-w-screen-sm mx-auto space-y-4">
-    <h1 class="text-4xl">{entry?.title}</h1>
+  <div class="max-w-screen-sm mx-auto space-y-4 opacity-80">
     <div class="whitespace-pre-wrap">{entry?.body}</div>
   </div>
 </div>

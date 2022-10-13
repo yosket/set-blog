@@ -1,30 +1,32 @@
 ---
-import constitution_of_japan from '../assets/images/constitution_of_japan.jpg'
-
 export interface Props {
   id: string
   title: string
   body: string
   href: string
+  image: string
 }
 
-const { id, href, title, body } = Astro.props
+const { id, href, title, body, image } = Astro.props
 ---
 
 <li>
-  <a href={href} class="flex flex-col gap-4 bg-white p-4 shadow-2xl">
+  <a href={href} class="flex flex-col gap-4 bg-gray-800 p-4 shadow-2xl">
     <img
       id={`thumbnail-${id}`}
-      src={constitution_of_japan}
+      src={`/images/${image}`}
       alt=""
       class="thumbnail object-cover aspect-video"
     />
-    <h2 class="text-xl">
-      {title}
-      <span>&rarr;</span>
-    </h2>
-    <p class="truncate text-gray-500">
-      {body}
-    </p>
+    <div>
+      <h2 class="text-xl">
+        {title}
+      </h2>
+      <div class="w-full">
+        <p class="truncate opacity-60">
+          {body}
+        </p>
+      </div>
+    </div>
   </a>
 </li>

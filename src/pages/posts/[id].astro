@@ -1,7 +1,7 @@
 ---
-import contents from '../assets/content.json'
-import Layout from '../layouts/Layout.astro'
-import Post from './fragments/posts/[id].astro'
+import contents from '../../assets/content.json'
+import Layout from '../../layouts/Layout.astro'
+import Post from '../fragments/posts/[id].astro'
 
 export const getStaticPaths = () =>
   contents.map((content) => ({ params: { id: content.id } }))

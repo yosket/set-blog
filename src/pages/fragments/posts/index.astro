@@ -3,15 +3,19 @@ import content from '../../../assets/content.json'
 import Card from '../../../components/Card.astro'
 ---
 
-<div class="container mx-auto">
-  <ul role="list" class="max-w-screen-lg mx-auto grid grid-cols-2 gap-8">
+<div class="container mx-auto p-4">
+  <ul
+    role="list"
+    class="md:max-w-screen-lg mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8"
+  >
     {
       content.map((item) => (
         <Card
           id={item.id}
-          href={`/${item.id}`}
+          href={`/posts/${item.id}`}
           title={item.title}
           body={item.body}
+          image={item.image}
         />
       ))
     }
